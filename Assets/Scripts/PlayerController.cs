@@ -9,9 +9,17 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private Transform cameraTransform; // Assign Cinemachine Camera Transform
 
+    // for the dash feature
+    [SerializeField] private float dashSpeed = 10f;
+    [SerializeField] private float dashDuration = 0.2f;
+    [SerializeField] private float dashCooldown = 1f;
+
     private Rigidbody playerRB;
     private bool isGrounded;
     private int jumpCount = 0; // to keep track of how many jumps the player has done
+    // for the dash feature
+    private bool isDashing;
+    private float dashCooldownTime;
 
     void Start()
     {
@@ -21,9 +29,22 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         MovePlayer();
-        if (Input.GetButtonDown("Jump") && (isGrounded || jumpCount < 2)) // add the double jump logic
+
+        // the jump logic
+        if (Input.GetKeyDown(KeyCode.Space) && (isGrounded || jumpCount < 2)) // add the double jump logic
         {
             Jump();
+        }
+
+        // the dash logic
+        if (Input.GetKeyDown(KeyCode.LeftShift) && dashCooldownTime <= 0f && !isDashing)
+        {
+            Dash();
+        }
+
+        if (dashCooldownTime > 0f)
+        {
+            dashCooldownTime -= Time.deltaTime;
         }
     }
 
@@ -80,5 +101,26 @@ public class PlayerController : MonoBehaviour
             isGrounded = true;
             jumpCount = 0; // reset back to 0 when touching the ground
         }
+    }
+
+    private void Dash()
+    {
+        isDashing = true;
+
+        // apply the dash force in the player's forward direction
+        Vector3 dashDirection = transform.forward;
+        playerRB.linearVelocity = dashDirection * dashSpeed; // Override velocity to perform dash
+        
+        // Start the dash cooldown
+        dashCooldownTime = dashCooldown;
+        
+        // Reset the dash state after the dash duration
+        Invoke("EndDash", dashDuration);
+    }
+
+    private void EndDash()
+    {
+        isDashing = false;
+        playerRB.linearVelocity = Vector3.zero;
     }
 }
