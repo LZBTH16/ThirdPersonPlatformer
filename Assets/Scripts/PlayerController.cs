@@ -1,3 +1,4 @@
+using System.Data.Common;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -7,8 +8,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float rotationSpeed = 10f;
 
     [SerializeField] private Transform cameraTransform; // Assign Cinemachine Camera Transform
+
     private Rigidbody playerRB;
     private bool isGrounded;
+    private int jumpCount = 0; // to keep track of how many jumps the player has done
 
     void Start()
     {
@@ -18,7 +21,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         MovePlayer();
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (Input.GetButtonDown("Jump") && (isGrounded || jumpCount < 2)) // add the double jump logic
         {
             Jump();
         }
@@ -57,6 +60,15 @@ public class PlayerController : MonoBehaviour
     private void Jump()
     {
         playerRB.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
+        if (isGrounded)
+        {
+            jumpCount = 1; // the player is on the ground, so they have one jump
+        }
+        else
+        {
+            jumpCount = Mathf.Min(jumpCount + 1, 2); // increment the jumpCount but max it out at 2
+        }
         isGrounded = false;
     }
 
@@ -66,6 +78,7 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
+            jumpCount = 0; // reset back to 0 when touching the ground
         }
     }
 }
