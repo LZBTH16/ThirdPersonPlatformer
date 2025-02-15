@@ -1416,7 +1416,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 8
-  jumpForce: 10
+  jumpForce: 12
   rotationSpeed: 10
   cameraTransform: {fileID: 1869850605}
   dashSpeed: 10
