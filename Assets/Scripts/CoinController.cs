@@ -16,6 +16,10 @@ public class CoinController : MonoBehaviour
         // Check if the player enters the trigger.
         if (other.CompareTag("Player"))
         {
+
+            // Add score to GameManager
+            GameManager.gameManager.AddScore(1);
+
             // Destroy the coin once it's collected.
             Destroy(gameObject);
         }
